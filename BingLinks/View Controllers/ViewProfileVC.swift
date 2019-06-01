@@ -11,6 +11,7 @@ import Firebase
 
 class ViewProfileVC: UIViewController {
 
+    // IBOutlets
     @IBOutlet weak var imgView : UIImageView!
     @IBOutlet weak var nameLabel : UILabel!
     @IBOutlet weak var classLabel : UILabel!
@@ -18,16 +19,19 @@ class ViewProfileVC: UIViewController {
     @IBOutlet weak var txtView : UITextView!
     
     
+    // user object set to optional type in case user == nil
     var user : User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // support swipe to go back functionality
         self.view.isUserInteractionEnabled = true
         let swipe = UIPanGestureRecognizer.init(target: self, action: #selector(backPressed))
         
         self.view.addGestureRecognizer(swipe)
         
+        // if user isn't logged in, don't try to access its members
         guard user != nil else {return}
         imgView.downloadImage(from: user?.pathToImage)
         nameLabel.text = user!.name
@@ -43,6 +47,7 @@ class ViewProfileVC: UIViewController {
         
         let options = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
         
+        // if user is reported, remove messages and match from both parties
         let report = UIAlertAction.init(title: "Report user", style: .destructive, handler: { (action:UIAlertAction!) in
             ref.child("users").child((self.user?.userID)!).child("reported").setValue((self.user?.numReports)!+1)
             })
@@ -70,10 +75,12 @@ class ViewProfileVC: UIViewController {
         options.addAction(report)
         options.addAction(block)
         options.addAction(cancel)
+        
+        // display the UIAlertController
         self.present(options, animated: true, completion: nil)
     }
     
-    
+    // go back one screen
     @objc @IBAction func backPressed(_sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
